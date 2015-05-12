@@ -1,13 +1,9 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 ## Loading and preprocessing the data
 
-```{r, echo=TRUE}
+
+```r
 activity <- read.csv("activity.csv")
 ```
 
@@ -16,30 +12,45 @@ activity <- read.csv("activity.csv")
 
 Total number of steps taken per day. NAs will be ignored.
 
-```{r, echo=TRUE}
+
+```r
 stepsbyday <- aggregate(steps ~ date, data = activity, sum, na.rm=TRUE)
 ```
 
   
 A histogram of the total number of steps taken each day
-```{r, echo=TRUE}
+
+```r
 hist(stepsbyday$steps, xlab="steps", main="Total Number of Steps Taken Each Day")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+
 Mean of the total number of steps taken per day
-```{r, echo=TRUE}
+
+```r
 mean(stepsbyday$steps, na.rm=TRUE)
 ```
 
+```
+## [1] 10766.19
+```
+
 Median of the total number of steps taken per day
-```{r, echo=TRUE}
+
+```r
 median(stepsbyday$steps, na.rm=TRUE)
+```
+
+```
+## [1] 10765
 ```
 
 ## What is the average daily activity pattern?
 
 A time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
-```{r, echo=TRUE}
+
+```r
 stepsbyinterval <- aggregate(steps ~ interval, data = activity, mean, na.rm=TRUE)
 plot(stepsbyinterval$interval
      , stepsbyinterval$steps
@@ -50,20 +61,33 @@ plot(stepsbyinterval$interval
      , xlab="Interval")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
+
 The 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps
-```{r, echo=TRUE}
+
+```r
 stepsbyinterval[which.max(stepsbyinterval$steps), 1]
+```
+
+```
+## [1] 835
 ```
 
 ## Imputing missing values
 
 The total number of missing values in the dataset (i.e. the total number of rows with NAs)
-```{r, echo=TRUE}
+
+```r
 sum(!complete.cases(activity))
 ```
 
+```
+## [1] 2304
+```
+
 Fills in the gap using the mean for that 5-minute interval
-```{r, echo=TRUE}
+
+```r
 for(i in which(!complete.cases(activity))){
   activity[i, 1] <- stepsbyinterval[stepsbyinterval$interval == activity[i, 3], 2]
 }
@@ -71,19 +95,32 @@ for(i in which(!complete.cases(activity))){
 
 
 Updated histogram
-```{r, echo=TRUE}
+
+```r
 stepsbyday <- aggregate(steps ~ date, data = activity, sum, na.rm=TRUE)
 hist(stepsbyday$steps, xlab="steps", main="Total Number of Steps Taken Each Day")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
+
 Mean of total number of steps taken per day
-```{r, echo=TRUE}
+
+```r
 mean(stepsbyday$steps, na.rm=TRUE)
 ```
 
+```
+## [1] 10766.19
+```
+
 Median total number of steps taken per day
-```{r, echo=TRUE}
+
+```r
 median(stepsbyday$steps, na.rm=TRUE)
+```
+
+```
+## [1] 10766.19
 ```
 
 After imputing missing data, mean and median total number of steps taken per day becomes the same. mean remains unchanged. Median is a little higher than the privous estimate. The overall impact of imputing missing data on the estimates of the total daily number of steps is miminum.  
@@ -93,11 +130,23 @@ After imputing missing data, mean and median total number of steps taken per day
 
 A time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis)  
 
-```{r, echo=TRUE}
+
+```r
 library(lattice)
 library(lubridate)
 library(plyr)
+```
 
+```
+## 
+## Attaching package: 'plyr'
+## 
+## The following object is masked from 'package:lubridate':
+## 
+##     here
+```
+
+```r
 activity <- mutate(activity, daytype = ifelse(lubridate::wday(date) %in% c(1, 7) == TRUE, "weekday", "weekend"))
 activity$daytype <- as.factor(activity$daytype )
 
@@ -109,3 +158,5 @@ xyplot(stepsbyinterval$steps ~ stepsbyinterval$interval | daytype
       , xlab="Interval"
       , ylab="Number of steps")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-13-1.png) 
